@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+body {
+  font-family: 'Inter', sans-serif;
+  @apply bg-gray-50 text-gray-900;
+}
+
+h1,h2,h3,h4,h5 {
+  font-weight: 600;
+  color: #023E8A;
+}
