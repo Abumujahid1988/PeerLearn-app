@@ -39,6 +39,14 @@ export default function Navbar() {
               >
                 Dashboard
               </Link>
+              {['instructor','admin'].includes(user.role) && (
+                <Link
+                  to="/editor"
+                  className="text-sm font-medium text-gray-700 hover:text-blue-700 transition-colors"
+                >
+                  Course Editor
+                </Link>
+              )}
               <button
                 onClick={logout}
                 className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors"

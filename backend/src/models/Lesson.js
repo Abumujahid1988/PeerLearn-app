@@ -1,11 +1,26 @@
 const mongoose = require('mongoose');
 
 const LessonSchema = new mongoose.Schema({
+  section: { type: mongoose.Schema.Types.ObjectId, ref: 'Section', required: true },
   course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course', required: true },
   title: { type: String, required: true },
+  description: String,
   content: String,
-  order: Number,
-  duration: Number
+  videoUrl: String,
+  attachments: [
+    {
+      name: String,
+      url: String,
+      type: { type: String, enum: ['pdf', 'image', 'video', 'document', 'other'] },
+      uploadedAt: { type: Date, default: Date.now }
+    }
+  ],
+  order: { type: Number, default: 0 },
+  duration: { type: Number, default: 0 },
+  completedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  isPublished: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Lesson', LessonSchema);

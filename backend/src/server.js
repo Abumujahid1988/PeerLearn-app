@@ -11,6 +11,9 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const courseRoutes = require('./routes/courseRoutes');
 const lessonRoutes = require('./routes/lessonRoutes');
+const sectionRoutes = require('./routes/sectionRoutes');
+const enrollmentRoutes = require('./routes/enrollmentRoutes');
+const discussionRoutes = require('./routes/discussionRoutes');
 const progressRoutes = require('./routes/progressRoutes');
 
 const app = express();
@@ -33,6 +36,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/lessons', lessonRoutes);
+app.use('/api/sections', sectionRoutes);
+app.use('/api/enrollments', enrollmentRoutes);
+app.use('/api/discussions', discussionRoutes);
 app.use('/api/progress', progressRoutes);
 
 app.get('/', (req, res) => res.json({ ok: true }));

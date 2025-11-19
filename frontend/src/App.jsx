@@ -11,6 +11,7 @@ import CourseDetail from './pages/CourseDetail';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import CourseEditor from './pages/CourseEditor';
 
 // Auth context
 import { useAuth } from './context/AuthContext';
@@ -40,6 +41,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/editor"
+            element={
+              <ProtectedRoute>
+                <CourseEditor />
               </ProtectedRoute>
             }
           />
