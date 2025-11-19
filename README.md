@@ -79,7 +79,6 @@ peerlearn-mvp/
 │   ├── src/
 │   │   ├── main.jsx                  # React entry point
 │   │   ├── App.jsx                   # App wrapper component
-│   │   ├── router.jsx                # Centralized routing file
 │   │   │
 │   │   ├── api/
 │   │   │   └── axios.js              # Axios instance with baseURL + token interceptor
@@ -103,11 +102,7 @@ peerlearn-mvp/
 │   │   │
 │   │   ├── styles/
 │   │   │   ├── index.css             # Tailwind entry styles
-│   │   │   └── globals.css           # Global overrides, font styles
-│   │   │
-│   │   └── utils/
-│   │       └── helpers.js            # Shared helper functions
-│
+│   
 └── .env.example                      # Sample env for developers
 ```
 
