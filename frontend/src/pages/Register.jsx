@@ -7,16 +7,24 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('student');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const nav = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
     try {
       await register(name, email, password, role);
       nav('/dashboard');
     } catch (err) {
-      alert(err.response?.data?.error || 'Register failed');
+      const errorMessage = err.response?.data?.error || err.message || 'Register failed';
+      console.error('Full error:', err);
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -27,6 +35,12 @@ export default function Register() {
         className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md"
       >
         <h2 className="text-3xl font-bold mb-6 text-blue-700 text-center">Register</h2>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
 
         <input
           type="text"
@@ -66,9 +80,10 @@ export default function Register() {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md transition duration-300"
+          disabled={loading}
+          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 rounded-lg shadow-md transition duration-300"
         >
-          Register
+          {loading ? 'Registering...' : 'Register'}
         </button>
       </form>
     </div>

@@ -15,7 +15,7 @@ export default function Footer() {
           </p>
           <div className="flex space-x-4">
             <a
-              href="https://github.com/"
+              href="https://github.com/Abumujahid1988/PeerLearn-app"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-white transition-colors"
@@ -23,7 +23,7 @@ export default function Footer() {
               <Github size={20} />
             </a>
             <a
-              href="https://twitter.com/"
+              href="https://x.com/abdullahab10517/"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-white transition-colors"
@@ -31,7 +31,7 @@ export default function Footer() {
               <Twitter size={20} />
             </a>
             <a
-              href="https://linkedin.com/"
+              href="https://www.linkedin.com/in/abdullahi-abdulganiyu-3742a421b/"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-white transition-colors"
@@ -39,7 +39,7 @@ export default function Footer() {
               <Linkedin size={20} />
             </a>
             <a
-              href="https://youtube.com/"
+              href="https://www.youtube.com/playlist?list=PLxyAeqIJrEFjZHd0oWz56g6x2zXJdgalB/"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-white transition-colors"

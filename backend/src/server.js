@@ -20,6 +20,15 @@ app.use(cors({ origin: process.env.CLIENT_ALLOWED_ORIGIN || 'http://localhost:51
 app.use(express.json());
 app.use(cookieParser());
 
+// Friendly JSON parse error handler - returns 400 with a readable message
+app.use((err, req, res, next) => {
+  if (err && err.type === 'entity.parse.failed') {
+    console.error('JSON parse error on request:', err.message);
+    return res.status(400).json({ error: 'Invalid JSON in request body' });
+  }
+  next(err);
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);

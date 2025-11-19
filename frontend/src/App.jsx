@@ -15,7 +15,7 @@ import Register from './pages/Register';
 // Auth context
 import { useAuth } from './context/AuthContext';
 
-// ✅ ProtectedRoute wrapper
+// ProtectedRoute wrapper
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" replace />;
