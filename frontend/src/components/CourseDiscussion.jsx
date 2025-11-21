@@ -61,31 +61,34 @@ export default function CourseDiscussion({ courseId }){
     }
   };
 
-  if(loading) return <div className='p-4'>Loading discussions...</div>;
+
+  if(loading) return <div className="p-6 text-center text-slate-500">Loading discussions...</div>;
 
   return (
-    <div className='bg-white p-4 rounded shadow'>
-      <h3 className='font-semibold mb-2'>Discussions</h3>
-      <form onSubmit={submitThread} className='space-y-2 mb-4'>
-        <input value={title} onChange={e=>setTitle(e.target.value)} placeholder='Thread title' className='w-full border rounded p-2' />
-        <textarea value={content} onChange={e=>setContent(e.target.value)} placeholder='Write your question or comment...' className='w-full border rounded p-2' rows={3} />
-        <div>
-          <button disabled={posting} className='px-3 py-1 bg-blue-600 text-white rounded'>{posting ? 'Posting...' : 'Post Thread'}</button>
+    <div className="bg-white p-6 rounded-xl shadow border border-slate-100">
+      <h3 className="font-bold text-lg mb-4 text-blue-900">Course Discussions</h3>
+      <form onSubmit={submitThread} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Thread title" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400" />
+        <textarea value={content} onChange={e=>setContent(e.target.value)} placeholder="Write your question or comment..." className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 min-h-20" rows={3} />
+        <div className="md:col-span-2 flex justify-end">
+          <button disabled={posting} className="px-6 py-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-lg transition-all duration-150 disabled:opacity-60">{posting ? 'Posting...' : 'Post Thread'}</button>
         </div>
       </form>
 
-      {threads.length === 0 ? <div className='text-sm text-slate-600'>No discussions yet. Start the conversation.</div> : (
-        <ul className='space-y-4'>
+      {threads.length === 0 ? (
+        <div className="text-center py-8 text-slate-500">No discussions yet. Start the conversation.</div>
+      ) : (
+        <ul className="space-y-6">
           {threads.map(thread => (
-            <li key={thread._id} className='border rounded p-3'>
-              <div className='flex justify-between items-start'>
+            <li key={thread._id} className="border rounded-lg p-4 bg-slate-50">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
                 <div>
-                  <div className='font-medium'>{thread.title}</div>
-                  <div className='text-sm text-slate-600'>by {thread.author?.name || thread.author?.email} • {new Date(thread.createdAt).toLocaleString()}</div>
-                  <div className='mt-2 text-sm'>{thread.content}</div>
+                  <div className="font-semibold text-blue-800 text-lg">{thread.title}</div>
+                  <div className="text-xs text-slate-500 mb-1">by {thread.author?.name || thread.author?.email} &bull; {new Date(thread.createdAt).toLocaleString()}</div>
+                  <div className="mt-1 text-sm text-slate-700">{thread.content}</div>
                 </div>
               </div>
-              <div className='mt-3'>
+              <div className="mt-4">
                 <CommentsList thread={thread} onAdd={(text, reset)=>addComment(thread._id, text, reset)} user={user} />
               </div>
             </li>

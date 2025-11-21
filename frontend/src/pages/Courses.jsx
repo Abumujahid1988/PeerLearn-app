@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api/axios';
+import { useToast } from '../context/ToastContext';
 import { Link } from 'react-router-dom';
 
-export default function Courses(){
+export default function Courses() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { addToast } = useToast();
 
   useEffect(()=>{
     let mounted = true;
     api.get('/courses')
       .then(r=>{ if(mounted) setCourses(r.data) })
-      .catch(err=>{ console.error('Failed to load courses', err) })
+      .catch(err=>{
+        console.error('Failed to load courses', err);
+        addToast('Failed to load courses', 'error');
+      })
       .finally(()=>{ if(mounted) setLoading(false) });
     return ()=> mounted = false;
   },[]);
@@ -34,7 +39,7 @@ export default function Courses(){
                 <p className='text-sm text-slate-600'>By {c.instructor?.name || 'Unknown'}</p>
                 <p className='mt-2 text-sm line-clamp-3'>{c.description}</p>
                 <div className='mt-2 flex items-center justify-between'>
-                  <div className='text-sm text-slate-700'>{c.difficulty} • {c.tags?.slice(0,3).join(', ')}</div>
+                  <div className='text-sm text-slate-700'>{c.difficulty} \u2022 {c.tags?.slice(0,3).join(', ')}</div>
                   <Link to={`/courses/${c._id}`} className='text-blue-600'>Open</Link>
                 </div>
               </div>

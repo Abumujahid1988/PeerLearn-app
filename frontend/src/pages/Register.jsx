@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 export default function Register() {
   const [name, setName] = useState('');
@@ -11,6 +12,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const nav = useNavigate();
+  const { addToast } = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,6 +25,7 @@ export default function Register() {
       const errorMessage = err.response?.data?.error || err.message || 'Register failed';
       console.error('Full error:', err);
       setError(errorMessage);
+      addToast(errorMessage, 'error');
     } finally {
       setLoading(false);
     }

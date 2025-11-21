@@ -9,9 +9,16 @@ import Home from './pages/Home';
 import Courses from './pages/Courses';
 import CourseDetail from './pages/CourseDetail';
 import Dashboard from './pages/Dashboard';
+
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import CourseEditor from './pages/CourseEditor';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminReports from './pages/AdminReports';
+import About from './pages/About';
+import Contact from './pages/Contact';
 
 // Auth context
 import { useAuth } from './context/AuthContext';
@@ -33,7 +40,12 @@ function App() {
           <Route path="/courses" element={<Courses />} />
           <Route path="/courses/:id" element={<CourseDetail />} />
           <Route path="/login" element={<Login />} />
+
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
 
           {/* Protected Route */}
           <Route
@@ -49,6 +61,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <CourseEditor />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/reports"
+            element={
+              <ProtectedRoute>
+                <AdminReports />
               </ProtectedRoute>
             }
           />

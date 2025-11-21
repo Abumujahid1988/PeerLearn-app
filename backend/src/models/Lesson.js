@@ -18,6 +18,15 @@ const LessonSchema = new mongoose.Schema({
   order: { type: Number, default: 0 },
   duration: { type: Number, default: 0 },
   completedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  rating: { type: Number, default: 0, min: 0, max: 5 },
+  reviews: [
+    {
+      student: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      rating: Number,
+      comment: String,
+      createdAt: { type: Date, default: Date.now }
+    }
+  ],
   isPublished: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
