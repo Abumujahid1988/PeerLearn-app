@@ -1,3 +1,6 @@
+import courseBuilderImg from '../assets/Online-Learning.jpg';
+import chatDiscussionImg from '../assets/chat-online.jpg';
+
 import React from 'react';
 
 export default function About(){
@@ -36,8 +39,8 @@ export default function About(){
             </ul>
           </div>
           <div className="md:w-1/2 mt-6 md:mt-0">
-            <div className="rounded-xl bg-white p-6 shadow">
-              <div className="h-44 bg-gradient-to-br from-slate-50 to-slate-100 rounded-md flex items-center justify-center text-slate-400">Course Builder Preview</div>
+            <div className="rounded-xl bg-white p-0 shadow overflow-hidden h-56 flex items-stretch">
+              <img src={courseBuilderImg} alt="Course Builder Preview" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>
@@ -53,8 +56,8 @@ export default function About(){
             </ul>
           </div>
           <div className="md:w-1/2 mt-6 md:mt-0">
-            <div className="rounded-xl bg-white p-6 shadow">
-              <div className="h-44 bg-gradient-to-br from-slate-50 to-slate-100 rounded-md flex items-center justify-center text-slate-400">Chat & Discussion Preview</div>
+            <div className="rounded-xl bg-white p-0 shadow overflow-hidden h-56 flex items-stretch">
+              <img src={chatDiscussionImg} alt="Chat & Discussion Preview" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>
@@ -84,7 +87,7 @@ export default function About(){
             <p className="mt-2 text-slate-700">Create your first course or explore existing content — PeerLearn supports both instructors and learners with easy onboarding.</p>
           </div>
           <div className="mt-4 md:mt-0">
-            <a href="/register" className="bg-blue-700 text-white px-5 py-3 rounded-md font-semibold shadow hover:bg-blue-600">Sign Up</a>
+            <a href="/register" className="bg-indigo-600 text-white font-semibold px-5 py-3 rounded-md shadow hover:bg-indigo-700 transition">Sign Up</a>
           </div>
         </div>
       </section>

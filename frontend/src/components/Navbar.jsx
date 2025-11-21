@@ -24,21 +24,26 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Desktop Links */}
-        <div className="hidden md:flex items-center space-x-6">
-          <Link to="/courses" className={`text-sm font-medium hover:text-white transition-colors ${location.pathname.startsWith('/courses') ? 'text-white' : 'text-blue-200'}`}>Courses</Link>
-          <Link to="/about" className={`text-sm font-medium hover:text-white transition-colors ${location.pathname === '/about' ? 'text-white' : 'text-blue-200'}`}>About</Link>
-          <Link to="/contact" className={`text-sm font-medium hover:text-white transition-colors ${location.pathname === '/contact' ? 'text-white' : 'text-blue-200'}`}>Contact</Link>
-
+        {/* Desktop Links - Centered nav, auth at right */}
+        <div className="hidden md:flex flex-1 justify-center items-center space-x-6">
           {user ? (
             <>
+              <Link to="/courses" className={`text-sm font-medium hover:text-white transition-colors ${location.pathname === '/courses' ? 'text-white' : 'text-blue-200'}`}>Courses</Link>
+              <Link to="/editor" className={`text-sm font-medium hover:text-white transition-colors ${location.pathname === '/editor' ? 'text-white' : 'text-blue-200'}`}>Course Editor</Link>
+              {user.role === 'admin' && (
+                <Link to="/admin" className={`text-sm font-medium hover:text-white transition-colors ${location.pathname === '/admin' ? 'text-white' : 'text-blue-200'}`}>Admin</Link>
+              )}
               <Link to="/dashboard" className={`text-sm font-medium hover:text-white transition-colors ${location.pathname === '/dashboard' ? 'text-white' : 'text-blue-200'}`}>Dashboard</Link>
-              {['instructor','admin'].includes(user.role) && <Link to="/editor" className="text-sm font-medium hover:text-white transition-colors text-blue-200">Course Editor</Link>}
-              {user.role === 'admin' && <Link to="/admin" className="text-sm font-medium hover:text-white transition-colors text-blue-200">Admin</Link>}
-              <button onClick={logout} className="ml-2 flex items-center gap-2 text-sm text-blue-200 hover:text-white">
-                <LogOut size={16} /> Logout
-              </button>
             </>
+          ) : null}
+        </div>
+
+        {/* Auth links always at right */}
+        <div className="hidden md:flex items-center space-x-4">
+          {user ? (
+            <button onClick={logout} className="flex items-center gap-2 text-sm text-blue-200 hover:text-white">
+              <LogOut size={16} /> Logout
+            </button>
           ) : (
             <>
               <Link to="/login" className="text-sm font-medium text-blue-200 hover:text-white transition-colors">Login</Link>
@@ -56,18 +61,18 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Dropdown */}
+      {/* Mobile Dropdown - user-specific links only after login */}
       {menuOpen && (
         <div className="md:hidden bg-blue-950 border-t border-blue-900 shadow-sm">
           <div className="flex flex-col px-4 py-4 space-y-3 text-blue-100">
-            <Link to="/courses" onClick={closeMenu} className="text-sm font-medium hover:text-white transition-colors">Courses</Link>
-            <Link to="/about" onClick={closeMenu} className="text-sm font-medium hover:text-white transition-colors">About</Link>
-            <Link to="/contact" onClick={closeMenu} className="text-sm font-medium hover:text-white transition-colors">Contact</Link>
             {user ? (
               <>
+                <Link to="/courses" onClick={closeMenu} className="text-sm font-medium hover:text-white transition-colors">Courses</Link>
+                <Link to="/editor" onClick={closeMenu} className="text-sm font-medium hover:text-white transition-colors">Course Editor</Link>
+                {user.role === 'admin' && (
+                  <Link to="/admin" onClick={closeMenu} className="text-sm font-medium hover:text-white transition-colors">Admin</Link>
+                )}
                 <Link to="/dashboard" onClick={closeMenu} className="text-sm font-medium hover:text-white transition-colors">Dashboard</Link>
-                {['instructor','admin'].includes(user.role) && <Link to="/editor" onClick={closeMenu} className="text-sm font-medium hover:text-white transition-colors">Course Editor</Link>}
-                {user.role === 'admin' && <Link to="/admin" onClick={closeMenu} className="text-sm font-medium hover:text-white transition-colors">Admin</Link>}
                 <button onClick={() => { logout(); closeMenu(); }} className="text-sm font-medium text-red-300 hover:text-red-200 text-left">Logout</button>
               </>
             ) : (

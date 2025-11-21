@@ -17,8 +17,12 @@ import ResetPassword from './pages/ResetPassword';
 import CourseEditor from './pages/CourseEditor';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminReports from './pages/AdminReports';
+
 import About from './pages/About';
 import Contact from './pages/Contact';
+import HelpCenter from './pages/HelpCenter';
+import TermsOfService from './pages/TermsOfService';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 // Auth context
 import { useAuth } from './context/AuthContext';
@@ -46,6 +50,11 @@ function App() {
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+
+          {/* Support Pages */}
+          <Route path="/help-center" element={<HelpCenter />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
           {/* Protected Route */}
           <Route

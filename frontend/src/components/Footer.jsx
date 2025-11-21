@@ -118,10 +118,10 @@ export default function Footer() {
         <div>
           <h3 className="text-lg font-semibold text-white mb-3">Support</h3>
           <ul className="space-y-2 text-sm">
-            <li><a href="/help" className="hover:text-white transition-colors">Help Center</a></li>
+            <li><Link to="/help-center" className="hover:text-white transition-colors">Help Center</Link></li>
             <li><a href="/faqs" className="hover:text-white transition-colors">FAQs</a></li>
-            <li><a href="/terms" className="hover:text-white transition-colors">Terms of Service</a></li>
-            <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+            <li><Link to="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link></li>
+            <li><Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
           </ul>
         </div>
 
@@ -153,9 +153,9 @@ export default function Footer() {
       {/* Bottom Section */}
       <div className="border-t border-blue-800 mt-10 pt-6 text-sm text-center text-gray-400">
         <div className="flex flex-col md:flex-row md:justify-between items-center gap-3">
-          <div>© {year} PeerLearn. All rights reserved.</div>
+          <div className="px-2">© {year} PeerLearn. All rights reserved.</div>
           <div>Built with <span role="img" aria-label="love">❤️</span> by the PeerLearn Team.</div>
-          <div className="text-xs">Version 1.0.0</div>
+          <div className="text-xs px-2">Version 1.0.0</div>
         </div>
       </div>
     </footer>

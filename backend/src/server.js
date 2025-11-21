@@ -25,9 +25,21 @@ const contactRoutes = require('./routes/contactRoutes');
 const http = require('http');
 const { Server } = require('socket.io');
 
+
+const path = require('path');
 const app = express();
-app.use(helmet());
-app.use(morgan('dev'));
+
+// Trust proxy for secure cookies and HTTPS on Render
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
+// Helmet config: allow cross-origin resource policy for static assets
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+}));
+
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'tiny' : 'dev'));
 app.use(cors({ origin: process.env.CLIENT_ALLOWED_ORIGIN || 'http://localhost:5173', credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
@@ -57,7 +69,23 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/contact', contactRoutes);
 
-app.get('/', (req, res) => res.json({ ok: true }));
+
+// Serve static files in production (e.g., frontend build)
+if (process.env.NODE_ENV === 'production') {
+  const clientBuildPath = path.join(__dirname, '../../frontend/dist');
+  app.use(express.static(clientBuildPath));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+  });
+} else {
+  app.get('/', (req, res) => res.json({ ok: true }));
+}
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
 
 const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
@@ -115,5 +143,8 @@ connectDB().then(() => {
     });
   });
 
-  server.listen(PORT, () => console.log('Server (with Socket.io) started on port', PORT));
+  server.listen(PORT, () => {
+    console.log(`Server (with Socket.io) started on port ${PORT}`);
+    console.log('Environment:', process.env.NODE_ENV);
+  });
 });
