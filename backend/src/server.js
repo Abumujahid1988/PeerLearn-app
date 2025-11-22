@@ -70,16 +70,9 @@ app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/contact', contactRoutes);
 
 
-// Serve static files in production (e.g., frontend build)
-if (process.env.NODE_ENV === 'production') {
-  const clientBuildPath = path.join(__dirname, '../../frontend/dist');
-  app.use(express.static(clientBuildPath));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(clientBuildPath, 'index.html'));
-  });
-} else {
-  app.get('/', (req, res) => res.json({ ok: true }));
-}
+app.get('/', (req, res) => {
+  res.json({ status: "Backend running" });
+});
 
 // Global error handler
 app.use((err, req, res, next) => {
