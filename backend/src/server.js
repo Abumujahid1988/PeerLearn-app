@@ -14,6 +14,7 @@ const lessonRoutes = require('./routes/lessonRoutes');
 const sectionRoutes = require('./routes/sectionRoutes');
 const enrollmentRoutes = require('./routes/enrollmentRoutes');
 const discussionRoutes = require('./routes/discussionRoutes');
+const progressRoutes = require('./routes/progressRoutes');
 
 const reviewRoutes = require('./routes/reviewRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
@@ -68,6 +69,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/progress', progressRoutes);
 
 
 app.get('/', (req, res) => {
@@ -93,6 +95,8 @@ connectDB().then(() => {
     }
   });
 
+  // Make io available in controllers via req.app.get('io')
+  app.set('io', io);
   io.on('connection', (socket) => {
     console.log('Socket connected:', socket.id);
 

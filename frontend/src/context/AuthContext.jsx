@@ -3,7 +3,7 @@ import api from '../api/axios';
 
 export const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -13,10 +13,18 @@ export function AuthProvider({ children }) {
       api
         .get('/auth/me')
         .then((r) => setUser(r.data.user))
-        .catch(() => localStorage.removeItem('token'))
+        .catch((err) => {
+          // On any auth error, clear token and user
+          try { localStorage.removeItem('token'); } catch (_) {}
+          setUser(null);
+          console.error('Auth check failed:', err?.response?.data?.error || err?.message);
+        })
         .finally(() => setLoading(false));
     } else setLoading(false);
   }, []);
+
+  // Listen for auth:logout events dispatched by the API layer (no hard redirect)
+  
 
   const login = async (email, password) => {
     try {
@@ -52,6 +60,6 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
 export const useAuth = () => useContext(AuthContext);

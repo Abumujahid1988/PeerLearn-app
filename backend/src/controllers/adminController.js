@@ -63,7 +63,16 @@ exports.removeUser = async (req, res) => {
     const { id } = req.params;
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ error: 'User not found' });
-    await user.remove();
+    // Remove enrollments
+    const Enrollment = require('../models/Enrollment');
+    await Enrollment.deleteMany({ student: user._id });
+    // Remove authored courses (if instructor)
+    const Course = require('../models/Course');
+    const authoredCourses = await Course.find({ instructor: user._id });
+    for (const course of authoredCourses) {
+      await Course.deleteOne({ _id: course._id });
+    }
+    await User.deleteOne({ _id: user._id });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: 'Server error', details: err.message });

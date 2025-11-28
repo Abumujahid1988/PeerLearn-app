@@ -22,10 +22,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // On any 401, clear the token and let the app handle logout
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
-      // Optionally redirect to login page
-      window.location.href = "/login";
+      // Don't redirect here; let React handle it via ProtectedRoute
     }
     return Promise.reject(error);
   }

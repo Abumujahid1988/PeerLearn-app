@@ -1,10 +1,27 @@
 import React, { useEffect, useState, useContext } from 'react';
+function ConfirmModal({ open, message, onConfirm, onCancel }) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-lg p-6 min-w-[300px]">
+        <div className="mb-4 text-lg text-blue-900 font-semibold">{message}</div>
+        <div className="flex gap-4 justify-end">
+          <button onClick={onCancel} className="px-4 py-2 bg-slate-200 rounded text-blue-900">Cancel</button>
+          <button onClick={onConfirm} className="px-4 py-2 bg-red-600 rounded text-white font-semibold">Remove</button>
+        </div>
+      </div>
+    </div>
+  );
+}
 import api from '../api/axios';
 import { AuthContext } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
 export default function AdminDashboard() {
-  const { user } = useContext(AuthContext);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [confirmAction, setConfirmAction] = useState(() => () => {});
+    const [confirmMessage, setConfirmMessage] = useState('');
+  const { user, loading: authLoading } = useContext(AuthContext);
   const { addToast } = useToast();
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
@@ -13,6 +30,18 @@ export default function AdminDashboard() {
   const [tab, setTab] = useState('stats');
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'student' });
   const [creatingUser, setCreatingUser] = useState(false);
+
+  // Redirect if not admin (after auth is loaded)
+  if (!authLoading && (!user || user.role !== 'admin')) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-red-600 mb-2">Access Denied</h1>
+          <p className="text-slate-600">You must be an admin to access this page.</p>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (!user || user.role !== 'admin') return;
@@ -35,21 +64,26 @@ export default function AdminDashboard() {
     try {
       await api.put(`/admin/users/${id}/role`, { role: newRole });
       setUsers(users => users.map(u => u._id === id ? { ...u, role: newRole } : u));
-      addToast('Role updated', 'success');
+      addToast('Role updated successfully', 'success');
     } catch (err) {
       addToast(err.response?.data?.error || 'Failed to update role', 'error');
     }
   };
 
   const handleRemoveUser = async (id) => {
-    if (!window.confirm('Remove this user?')) return;
-    try {
-      await api.delete(`/admin/users/${id}`);
-      setUsers(users => users.filter(u => u._id !== id));
-      addToast('User removed', 'success');
-    } catch (err) {
-      addToast(err.response?.data?.error || 'Failed to remove user', 'error');
-    }
+    setConfirmMessage('Are you sure you want to remove this user?');
+    setConfirmAction(() => async () => {
+      setConfirmOpen(false);
+      try {
+        await api.delete(`/admin/users/${id}`);
+        const usersRes = await api.get('/admin/users');
+        setUsers(usersRes.data);
+        addToast('User removed successfully', 'success');
+      } catch (err) {
+        addToast(err.response?.data?.error || 'Failed to remove user', 'error');
+      }
+    });
+    setConfirmOpen(true);
   };
 
   // Handler for creating a new user (moved out so it's accessible)
@@ -69,14 +103,19 @@ export default function AdminDashboard() {
   };
 
   const handleRemoveCourse = async (id) => {
-    if (!window.confirm('Remove this course?')) return;
-    try {
-      await api.delete(`/admin/courses/${id}`);
-      setCourses(courses => courses.filter(c => c._id !== id));
-      addToast('Course removed', 'success');
-    } catch (err) {
-      addToast(err.response?.data?.error || 'Failed to remove course', 'error');
-    }
+    setConfirmMessage('Are you sure you want to remove this course?');
+    setConfirmAction(() => async () => {
+      setConfirmOpen(false);
+      try {
+        await api.delete(`/admin/courses/${id}`);
+        const coursesRes = await api.get('/admin/courses');
+        setCourses(coursesRes.data);
+        addToast('Course removed successfully', 'success');
+      } catch (err) {
+        addToast(err.response?.data?.error || 'Failed to remove course', 'error');
+      }
+    });
+    setConfirmOpen(true);
   };
 
   if (!user || user.role !== 'admin') return <div className="p-8 text-center text-red-600">Access denied.</div>;
@@ -84,6 +123,12 @@ export default function AdminDashboard() {
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-8">
+      <ConfirmModal
+        open={confirmOpen}
+        message={confirmMessage}
+        onConfirm={confirmAction}
+        onCancel={() => setConfirmOpen(false)}
+      />
       <h2 className="text-3xl font-bold mb-6 text-blue-900">Admin Dashboard</h2>
       <div className="mb-6 flex gap-4">
         <button onClick={() => setTab('stats')} className={`px-4 py-2 rounded ${tab==='stats'?'bg-blue-700 text-white':'bg-slate-200 text-blue-900'}`}>Platform Stats</button>

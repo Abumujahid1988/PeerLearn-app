@@ -73,7 +73,7 @@ export default function Footer() {
               <Linkedin size={20} />
             </a>
             <a
-              href="https://www.youtube.com/playlist?list=PLxyAeqIJrEFjZHd0oWz56g6x2zXJdgalB/"
+              href="https://www.youtube.com/watch?v=7CqJlxBYj-M&t=1s"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="PeerLearn on YouTube"
@@ -119,7 +119,7 @@ export default function Footer() {
           <h3 className="text-lg font-semibold text-white mb-3">Support</h3>
           <ul className="space-y-2 text-sm">
             <li><Link to="/help-center" className="hover:text-white transition-colors">Help Center</Link></li>
-            <li><a href="/faqs" className="hover:text-white transition-colors">FAQs</a></li>
+            <li><Link to="/faqs" className="hover:text-white transition-colors">FAQs</Link></li>
             <li><Link to="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link></li>
             <li><Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
           </ul>

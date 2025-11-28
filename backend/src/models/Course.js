@@ -13,6 +13,14 @@ const CourseSchema = new mongoose.Schema({
   enrolledStudents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   sections: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Section' }],
   rating: { type: Number, default: 0, min: 0, max: 5 },
+  // resourceLinks placed after rating as requested
+  resourceLinks: [
+    {
+      label: { type: String, required: true },
+      url: { type: String, required: true },
+      type: { type: String, enum: ['pdf', 'video', 'audio', 'link'], default: 'link' }
+    }
+  ],
   reviews: [
     {
       student: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

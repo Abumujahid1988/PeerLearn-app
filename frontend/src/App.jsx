@@ -27,10 +27,28 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 // Auth context
 import { useAuth } from './context/AuthContext';
 
+// Components
+import AccessDenied from './components/AccessDenied';
+
 // ProtectedRoute wrapper
 function ProtectedRoute({ children }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  // While loading, render nothing (not a loading message that flashes)
+  // This prevents UI flicker on protected routes
+  if (loading) return null;
   return user ? children : <Navigate to="/login" replace />;
+}
+
+// Role-based protected route: requires authentication and allowed roles
+function RoleProtectedRoute({ children, allowedRoles = [] }) {
+  const { user, loading } = useAuth();
+  // While loading, render nothing to prevent flashing and disappearing
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+    return <AccessDenied />;
+  }
+  return children;
 }
 
 function App() {
@@ -68,9 +86,9 @@ function App() {
           <Route
             path="/editor"
             element={
-              <ProtectedRoute>
+              <RoleProtectedRoute allowedRoles={[ 'instructor', 'admin' ]}>
                 <CourseEditor />
-              </ProtectedRoute>
+              </RoleProtectedRoute>
             }
           />
           <Route

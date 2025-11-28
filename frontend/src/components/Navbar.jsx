@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { Menu, X, User, LogOut } from 'lucide-react';
 
@@ -7,6 +7,7 @@ export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const closeMenu = () => setMenuOpen(false);
@@ -41,7 +42,13 @@ export default function Navbar() {
         {/* Auth links always at right */}
         <div className="hidden md:flex items-center space-x-4">
           {user ? (
-            <button onClick={logout} className="flex items-center gap-2 text-sm text-blue-200 hover:text-white">
+            <button
+              onClick={() => {
+                logout();
+                navigate('/');
+              }}
+              className="flex items-center gap-2 text-sm text-blue-200 hover:text-white"
+            >
               <LogOut size={16} /> Logout
             </button>
           ) : (
@@ -73,7 +80,14 @@ export default function Navbar() {
                   <Link to="/admin" onClick={closeMenu} className="text-sm font-medium hover:text-white transition-colors">Admin</Link>
                 )}
                 <Link to="/dashboard" onClick={closeMenu} className="text-sm font-medium hover:text-white transition-colors">Dashboard</Link>
-                <button onClick={() => { logout(); closeMenu(); }} className="text-sm font-medium text-red-300 hover:text-red-200 text-left">Logout</button>
+                <button
+                  onClick={() => {
+                    logout();
+                    closeMenu();
+                    navigate('/');
+                  }}
+                  className="text-sm font-medium text-red-300 hover:text-red-200 text-left"
+                >Logout</button>
               </>
             ) : (
               <>

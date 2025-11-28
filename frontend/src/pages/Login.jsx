@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
@@ -62,7 +62,7 @@ export default function Login() {
           required
         />
         <div className="mb-6 text-right">
-          <a href="/forgot-password" className="text-blue-600 hover:underline text-sm">Forgot password?</a>
+          <Link to="/forgot-password" className="text-blue-600 hover:underline text-sm">Forgot password?</Link>
         </div>
 
         <button

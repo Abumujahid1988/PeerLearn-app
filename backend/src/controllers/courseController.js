@@ -5,7 +5,12 @@ const Enrollment = require('../models/Enrollment');
 
 exports.list = async (req, res) => {
   try {
-    const courses = await Course.find().populate('instructor','name email');
+    let courses = await Course.find().populate('instructor','name email').populate('enrolledStudents', '_id');
+    courses = courses.map(course => {
+      const obj = course.toObject();
+      obj.enrolledStudents = (obj.enrolledStudents || []).map(u => String(u._id));
+      return obj;
+    });
     res.json(courses);
   } catch (err) {
     res.status(500).json({ error: 'Server error', details: err.message });
@@ -71,7 +76,7 @@ exports.remove = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
     if(!course) return res.status(404).json({ error: 'Not found' });
-    if(String(course.instructor) !== String(req.user._id) && req.user.role !== 'admin') return res.status(403).json({ error: 'Forbidden' });
+    if(req.user.role !== 'admin' && String(course.instructor) !== String(req.user._id)) return res.status(403).json({ error: 'Forbidden' });
     // remove sections and lessons cascade
     const sections = await Section.find({ course: course._id });
     for(const s of sections) {
@@ -88,7 +93,7 @@ exports.remove = async (req, res) => {
 
 exports.enroll = async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id);
+    let course = await Course.findById(req.params.id);
     if(!course) return res.status(404).json({ error: 'Not found' });
     // create or update enrollment
     let enrollment = await Enrollment.findOne({ student: req.user._id, course: course._id });
@@ -100,7 +105,11 @@ exports.enroll = async (req, res) => {
         await course.save();
       }
     }
-    res.json({ enrollment, course });
+    // Always return course with populated enrolledStudents for frontend
+    course = await Course.findById(course._id).populate('enrolledStudents', '_id');
+    let courseObj = course.toObject();
+    courseObj.enrolledStudents = (courseObj.enrolledStudents || []).map(u => String(u._id));
+    res.json({ enrollment, course: courseObj });
   } catch (err) {
     res.status(500).json({ error: 'Server error', details: err.message });
   }

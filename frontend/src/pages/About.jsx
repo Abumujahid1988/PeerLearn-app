@@ -2,6 +2,7 @@ import courseBuilderImg from '../assets/Online-Learning.jpg';
 import chatDiscussionImg from '../assets/chat-online.jpg';
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function About(){
   return (
@@ -13,8 +14,8 @@ export default function About(){
             <h1 className="text-4xl md:text-5xl font-extrabold leading-tight">Build, Learn, and Grow Together</h1>
             <p className="mt-4 text-lg text-blue-100 max-w-2xl">PeerLearn empowers instructors and learners with collaborative courses, structured lesson paths, and real-time communication — all in a single platform designed for community-driven learning.</p>
             <div className="mt-6 flex gap-3">
-              <a href="/courses" className="bg-white text-blue-700 font-semibold px-5 py-3 rounded-md shadow hover:opacity-95">Explore Courses</a>
-              <a href="/contact" className="border border-white text-white px-5 py-3 rounded-md hover:bg-white/10">Request a Demo</a>
+              <Link to="/courses" className="bg-white text-blue-700 font-semibold px-5 py-3 rounded-md shadow hover:opacity-95">Explore Courses</Link>
+              <Link to="/contact" className="border border-white text-white px-5 py-3 rounded-md hover:bg-white/10">Request a Demo</Link>
             </div>
           </div>
           <div className="hidden md:block md:flex-1">
@@ -86,8 +87,8 @@ export default function About(){
             <h3 className="text-2xl font-bold text-slate-900">Ready to get started?</h3>
             <p className="mt-2 text-slate-700">Create your first course or explore existing content — PeerLearn supports both instructors and learners with easy onboarding.</p>
           </div>
-          <div className="mt-4 md:mt-0">
-            <a href="/register" className="bg-indigo-600 text-white font-semibold px-5 py-3 rounded-md shadow hover:bg-indigo-700 transition">Sign Up</a>
+            <div className="mt-4 md:mt-0">
+            <Link to="/register" className="bg-indigo-600 text-white font-semibold px-5 py-3 rounded-md shadow hover:bg-indigo-700 transition">Sign Up</Link>
           </div>
         </div>
       </section>

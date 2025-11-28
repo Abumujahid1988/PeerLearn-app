@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
+import socket from '../utils/socket';
 import api from '../api/axios';
 import { useToast } from '../context/ToastContext';
 import { AuthContext } from '../context/AuthContext';
@@ -14,15 +15,27 @@ export default function CourseDiscussion({ courseId }){
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  useEffect(()=>{
+  useEffect(() => {
     let mounted = true;
     setLoading(true);
     api.get(`/discussions/course/${courseId}`)
-      .then(r => { if(mounted) setThreads(r.data || []); })
+      .then(r => { if (mounted) setThreads(r.data || []); })
       .catch(err => { console.error('Failed to load threads', err); addToast('Failed to load discussions', 'error'); })
-      .finally(()=> { if(mounted) setLoading(false); });
-    return ()=> mounted = false;
-  },[courseId]);
+      .finally(() => { if (mounted) setLoading(false); });
+
+    // Socket.io join room for real-time updates
+    socket.connect();
+    socket.emit('joinRoom', { room: `course-${courseId}` });
+    socket.on('newComment', ({ threadId, comment }) => {
+      setThreads(t => t.map(th => th._id === threadId ? { ...th, comments: [...(th.comments || []), comment] } : th));
+    });
+    return () => {
+      socket.emit('leaveRoom', { room: `course-${courseId}` });
+      socket.off('newComment');
+      socket.disconnect();
+      mounted = false;
+    };
+  }, [courseId]);
 
   const submitThread = async (e) =>{
     e.preventDefault();
@@ -45,16 +58,18 @@ export default function CourseDiscussion({ courseId }){
     }finally{ setPosting(false); }
   };
 
-  const addComment = async (threadId, text, resetCb) =>{
-    if(!text || !text.trim()){ addToast('Comment cannot be empty', 'error'); return; }
+  const addComment = async (threadId, text, resetCb) => {
+    if (!text || !text.trim()) { addToast('Comment cannot be empty', 'error'); return; }
     const tempComment = { _id: `c-temp-${Date.now()}`, content: text, author: { name: 'You' }, createdAt: new Date().toISOString(), pending: true };
-    setThreads(t => t.map(th => th._id === threadId ? { ...th, comments: [...(th.comments||[]), tempComment] } : th));
-    try{
+    setThreads(t => t.map(th => th._id === threadId ? { ...th, comments: [...(th.comments || []), tempComment] } : th));
+    try {
       const res = await api.post(`/discussions/${threadId}/comments`, { content: text });
       setThreads(t => t.map(th => th._id === threadId ? { ...th, comments: th.comments.map(c => c._id === tempComment._id ? res.data : c) } : th));
+      // Emit new comment to room for real-time update
+      socket.emit('newComment', { room: `course-${courseId}`, threadId, comment: res.data });
       resetCb && resetCb();
       addToast('Comment added', 'success');
-    }catch(err){
+    } catch (err) {
       console.error('Add comment failed', err);
       setThreads(t => t.map(th => th._id === threadId ? { ...th, comments: th.comments.filter(c => c._id !== tempComment._id) } : th));
       addToast(err.response?.data?.error || 'Failed to add comment', 'error');
@@ -99,13 +114,13 @@ export default function CourseDiscussion({ courseId }){
   );
 }
 
-function CommentsList({ thread, onAdd, user }){
+function CommentsList({ thread, onAdd, user }) {
   const [text, setText] = useState('');
   const navigate = useNavigate();
   return (
     <div className='mt-2'>
       <ul className='space-y-2'>
-        {(thread.comments||[]).map(c => (
+        {(thread.comments || []).map(c => (
           <li key={c._id} className='text-sm p-2 bg-slate-50 rounded'>
             <div className='text-xs text-slate-500'>{c.author?.name || c.author?.email} • {new Date(c.createdAt).toLocaleString()}</div>
             <div className='mt-1'>{c.content}</div>
@@ -113,14 +128,24 @@ function CommentsList({ thread, onAdd, user }){
         ))}
       </ul>
       {user ? (
-        <form onSubmit={(e)=>{ e.preventDefault(); onAdd(text, ()=>setText('')); }} className='mt-2 flex gap-2'>
-          <input value={text} onChange={e=>setText(e.target.value)} placeholder='Write a reply...' className='flex-1 border rounded p-2' />
-          <button type='submit' className='px-3 py-1 bg-indigo-600 text-white rounded'>Reply</button>
+        <form onSubmit={(e) => { e.preventDefault(); onAdd(text, () => setText('')); }} className='mt-2 flex flex-col sm:flex-row gap-2'>
+          <input
+            value={text}
+            onChange={e => setText(e.target.value)}
+            placeholder='Write a reply...'
+            className='flex-1 border rounded p-3 text-base sm:text-sm'
+            style={{ minWidth: 0 }}
+          />
+          <button
+            type='submit'
+            className='w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded font-semibold text-base sm:text-sm transition-all duration-150'
+            style={{ minWidth: '80px' }}
+          >Reply</button>
         </form>
       ) : (
         <div className='mt-2 text-sm text-slate-600'>
           <span>Please </span>
-          <button onClick={()=>navigate('/login')} className='underline text-blue-600'>login</button>
+          <button onClick={() => navigate('/login')} className='underline text-blue-600'>login</button>
           <span> to reply.</span>
         </div>
       )}

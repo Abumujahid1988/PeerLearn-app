@@ -40,7 +40,7 @@ exports.getThread = async (req, res) => {
 exports.addComment = async (req, res) => {
   try {
     const thread = await Thread.findById(req.params.id);
-    if(!thread) return res.status(404).json({ error: 'Not found' });
+    if (!thread) return res.status(404).json({ error: 'Not found' });
     const { content } = req.body;
     if (!content) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -48,8 +48,18 @@ exports.addComment = async (req, res) => {
     const comment = { author: req.user._id, content };
     thread.comments.push(comment);
     await thread.save();
-    const populated = await Thread.findById(thread._id).populate('comments.author','name');
-    res.status(201).json(populated);
+    // Get the last comment (just added)
+    const populatedThread = await Thread.findById(thread._id).populate('comments.author', 'name');
+    const newComment = populatedThread.comments[populatedThread.comments.length - 1];
+    res.status(201).json(newComment);
+
+    // Emit real-time update to course room
+    if (req.app.get('io')) {
+      req.app.get('io').to(`course-${thread.course}`).emit('newComment', {
+        threadId: thread._id.toString(),
+        comment: newComment
+      });
+    }
   } catch (err) {
     res.status(500).json({ error: 'Server error', details: err.message });
   }
