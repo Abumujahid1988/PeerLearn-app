@@ -137,7 +137,7 @@ export default function CourseEditor(){
             <input className="w-full p-3 border border-slate-300 rounded-lg" placeholder="Tags (comma separated)" value={tags} onChange={e => setTags(e.target.value)} />
             {/* Resource Links Editor */}
             <div className="mt-4">
-              <h4 className="font-semibold mb-2 text-blue-800">Course Resources</h4>
+              <h4 className="font-semibold mb-2 text-indigo-800">Course Resources</h4>
               {resourceLinks.map((res, idx) => (
                 <div key={idx} className="flex gap-2 mb-2 items-center">
                   <input type="text" className="p-2 border rounded w-1/3" placeholder="Label" value={res.label} onChange={e => {
@@ -197,7 +197,7 @@ export default function CourseEditor(){
                 <div className="flex items-start gap-4 mb-4">
                   {course.thumbnail && <img src={course.thumbnail} alt={course.title} className="w-24 h-20 object-cover rounded" />}
                   <div className="flex-1">
-                    <h3 className="font-semibold text-lg text-blue-800">{course.title}</h3>
+                    <h3 className="font-semibold text-lg text-indigo-800">{course.title}</h3>
                     <p className="text-xs text-slate-500">{course.difficulty} • {course.category}</p>
                     <p className="text-sm text-slate-700 mt-1">{course.description}</p>
                     <div className="flex flex-wrap gap-1 mt-2">
@@ -206,7 +206,7 @@ export default function CourseEditor(){
                     <div className="text-sm font-bold text-blue-700 mt-2">${course.price}</div>
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => startEdit(course)} className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">Edit</button>
+                    <button onClick={() => startEdit(course)} className="px-3 py-1 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">Edit</button>
                     <button onClick={() => deleteCourse(course._id)} className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">Delete</button>
                   </div>
                 </div>
@@ -214,7 +214,7 @@ export default function CourseEditor(){
                 {/* Sections list */}
                 <div className="mt-4 border-t pt-4">
                   <div className="flex justify-between items-center mb-3">
-                    <h4 className="font-semibold text-blue-800">Sections ({course.sections?.length || 0})</h4>
+                    <h4 className="font-semibold text-indigo-800">Sections ({course.sections?.length || 0})</h4>
                     <AddSectionForm courseId={course._id} onAdd={(title, desc) => addSection(course._id, title, desc)} />
                   </div>
                   {course.sections?.length ? (
@@ -287,7 +287,7 @@ function AddSectionForm({ courseId, onAdd }) {
         <form onSubmit={handle} className="mt-2 space-y-2 p-3 bg-green-50 rounded border border-green-200">
           <input className="w-full p-2 border rounded text-sm" placeholder="Section title" value={title} onChange={e => setTitle(e.target.value)} required />
           <textarea className="w-full p-2 border rounded text-sm" placeholder="Section description" value={desc} onChange={e => setDesc(e.target.value)} />
-          <button className="px-3 py-1 bg-green-600 text-white rounded text-sm">Add Section</button>
+          <button className="px-3 py-1 bg-emerald-600 text-white rounded text-sm hover:bg-emerald-700">Add Section</button>
         </form>
       )}
     </div>

@@ -9,6 +9,8 @@ import Home from './pages/Home';
 import Courses from './pages/Courses';
 import CourseDetail from './pages/CourseDetail';
 import Dashboard from './pages/Dashboard';
+import AssignmentAttempt from './pages/AssignmentAttempt';
+import SubmissionGrader from './pages/SubmissionGrader';
 
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -61,6 +63,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/courses/:id" element={<CourseDetail />} />
+          <Route path="/courses/:courseId/assignments/:assignmentId" element={<AssignmentAttempt />} />
+          <Route path="/assignments/:assignmentId/grader" element={<SubmissionGrader />} />
           <Route path="/login" element={<Login />} />
 
           <Route path="/register" element={<Register />} />

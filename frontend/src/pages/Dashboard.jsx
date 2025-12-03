@@ -77,9 +77,9 @@ export default function Dashboard() {
               <div className="text-xs text-slate-500">{user?.email || 'abumujahid555@gmail.com'}</div>
             </div>
             {user?.avatarUrl ? (
-              <img src={user.avatarUrl} alt={user.name} className="w-12 h-12 rounded-full object-cover border-2 border-blue-700" />
+              <img src={user.avatarUrl} alt={user.name} className="w-12 h-12 rounded-full object-cover border-2 border-indigo-600" />
             ) : (
-              <div className="w-12 h-12 rounded-full bg-blue-200 flex items-center justify-center text-xl font-bold text-blue-700 border-2 border-blue-700">
+              <div className="w-12 h-12 rounded-full bg-indigo-200 flex items-center justify-center text-xl font-bold text-indigo-600 border-2 border-indigo-600">
                 {user?.name ? user.name[0].toUpperCase() : 'A'}
               </div>
             )}
@@ -114,7 +114,7 @@ export default function Dashboard() {
                       <div className="w-full bg-slate-200 rounded-full h-2.5 mb-1">
                         {(() => {
                           const pct = progressMap[c._id]?.percentage ?? 0;
-                          return <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${pct}%` }} />;
+                          return <div className="bg-indigo-600 h-2.5 rounded-full" style={{ width: `${pct}%` }} />;
                         })()}
                       </div>
                       <div className="text-xs text-slate-500">
@@ -125,7 +125,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className="flex justify-end gap-2 mt-2">
-                      <Link to={`/courses/${c._id}`} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700">Explore</Link>
+                      <Link to={`/courses/${c._id}`} className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700">Explore</Link>
                     </div>
                   </div>
                 ))}
@@ -140,7 +140,7 @@ export default function Dashboard() {
             <h2 className="text-2xl font-bold text-blue-900 mb-6">{user?.role === 'admin' ? 'Platform Management' : 'My Courses'}</h2>
             {/* Analytics */}
             <div className="mb-8">
-              <h3 className="text-xl font-bold mb-4 text-blue-800">Analytics</h3>
+              <h3 className="text-xl font-bold mb-4 text-indigo-800">Analytics</h3>
               {analyticsLoading ? (
                 <div className="text-slate-500">Loading analytics...</div>
               ) : analytics.length === 0 ? (
@@ -188,7 +188,7 @@ export default function Dashboard() {
                     </div>
                     <div className="text-sm text-slate-700 line-clamp-2">{c.description}</div>
                     <div className="flex gap-2 mt-2">
-                      <Link to={`/courses/${c._id}`} className="flex-1 text-center px-3 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 text-sm">View</Link>
+                      <Link to={`/courses/${c._id}`} className="flex-1 text-center px-3 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 text-sm">View</Link>
                       <Link to={`/editor?id=${c._id}`} className="flex-1 text-center px-3 py-2 bg-slate-600 text-white rounded-lg font-semibold hover:bg-slate-700 text-sm">Edit</Link>
                     </div>
                   </div>

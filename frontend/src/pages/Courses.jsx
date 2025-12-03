@@ -49,7 +49,7 @@ export default function Courses() {
 
   return (
     <div>
-      <h2 className='text-2xl font-semibold mb-4'>Courses</h2>
+      <h2 className='text-2xl font-semibold mb-4 text-indigo-700'>Courses</h2>
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
         {courses.map(c => {
           const isEnrolled = user && Array.isArray(c.enrolledStudents) && c.enrolledStudents.some(e => String(e._id || e) === String(user._id || user.id));
@@ -61,9 +61,9 @@ export default function Courses() {
                 <div className='w-24 h-24 bg-slate-100 rounded mr-4 flex items-center justify-center text-sm text-slate-500'>No image</div>
               )}
               <div className='flex-1'>
-                <h3 className='font-semibold text-lg'>{c.title}</h3>
+                <h3 className='font-semibold text-lg text-slate-900'>{c.title}</h3>
                 <p className='text-sm text-slate-600'>By {c.instructor?.name || 'Unknown'}</p>
-                <p className='mt-2 text-sm line-clamp-3'>{c.description}</p>
+                <p className='mt-2 text-sm line-clamp-3 text-slate-700'>{c.description}</p>
                 <div className='mt-2 flex items-center justify-between'>
                   <div className='text-sm text-slate-700'>{c.difficulty}  {c.tags?.slice(0, 3).join(', ')}</div>
                 </div>
@@ -76,7 +76,7 @@ export default function Courses() {
                         href={res.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`text-xs px-2 py-1 rounded ${res.type === 'pdf' ? 'bg-red-100 text-red-700' : res.type === 'video' ? 'bg-blue-100 text-blue-700' : res.type === 'audio' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-700'}`}
+                        className={`text-xs px-2 py-1 rounded ${res.type === 'pdf' ? 'bg-red-100 text-red-700' : res.type === 'video' ? 'bg-indigo-100 text-indigo-700' : res.type === 'audio' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'}`}
                       >
                         {res.label} {res.type === 'pdf' ? '📄' : res.type === 'video' ? '🎬' : res.type === 'audio' ? '🎧' : '🔗'}
                       </a>
@@ -87,12 +87,12 @@ export default function Courses() {
                   {isEnrolled ? (
                     <Link
                       to={`/courses/${c._id}`}
-                      className='px-4 py-2 rounded-lg font-semibold bg-green-600 text-white hover:bg-green-700'
+                      className='px-4 py-2 rounded-lg font-semibold bg-emerald-600 text-white hover:bg-emerald-700'
                     >Explore Course</Link>
                   ) : (
                     <button
                       onClick={() => handleEnroll(c._id)}
-                      className='px-4 py-2 rounded-lg font-semibold bg-blue-700 text-white hover:bg-blue-800'
+                      className='px-4 py-2 rounded-lg font-semibold bg-indigo-600 text-white hover:bg-indigo-700'
                     >Enroll</button>
                   )}
                 </div>

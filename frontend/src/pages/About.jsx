@@ -8,20 +8,20 @@ export default function About(){
   return (
     <div className="max-w-6xl mx-auto px-6 md:px-12 py-12 space-y-16">
       {/* Hero */}
-      <section className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl p-10 md:p-16 shadow-lg">
+      <section className="bg-gradient-to-r from-indigo-600 to-indigo-500 text-white rounded-2xl p-10 md:p-16 shadow-lg">
         <div className="md:flex md:items-center md:justify-between gap-6">
           <div className="md:flex-1">
             <h1 className="text-4xl md:text-5xl font-extrabold leading-tight">Build, Learn, and Grow Together</h1>
-            <p className="mt-4 text-lg text-blue-100 max-w-2xl">PeerLearn empowers instructors and learners with collaborative courses, structured lesson paths, and real-time communication — all in a single platform designed for community-driven learning.</p>
+            <p className="mt-4 text-lg text-indigo-100 max-w-2xl">PeerLearn empowers instructors and learners with collaborative courses, structured lesson paths, and real-time communication — all in a single platform designed for community-driven learning.</p>
             <div className="mt-6 flex gap-3">
-              <Link to="/courses" className="bg-white text-blue-700 font-semibold px-5 py-3 rounded-md shadow hover:opacity-95">Explore Courses</Link>
+              <Link to="/courses" className="bg-white text-indigo-600 font-semibold px-5 py-3 rounded-md shadow hover:opacity-95">Explore Courses</Link>
               <Link to="/contact" className="border border-white text-white px-5 py-3 rounded-md hover:bg-white/10">Request a Demo</Link>
             </div>
           </div>
           <div className="hidden md:block md:flex-1">
             <div className="bg-white/20 rounded-lg p-6">
               <h4 className="text-white font-semibold">Why PeerLearn?</h4>
-              <p className="mt-2 text-blue-100">Community-first approach, hands-on lessons, and tools that help instructors focus on teaching while learners get practical experience.</p>
+              <p className="mt-2 text-indigo-100">Community-first approach, hands-on lessons, and tools that help instructors focus on teaching while learners get practical experience.</p>
             </div>
           </div>
         </div>

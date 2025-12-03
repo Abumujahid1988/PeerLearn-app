@@ -4,25 +4,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#2563EB',
-        primaryDark: '#1D4ED8',
-        accent: '#38BDF8',
-        background: '#F9FAFB',
-        footer: '#0F172A',
-        // ocean as numeric scale + DEFAULT
-        ocean: {
-          50:  '#e9f6ff',
-          100: '#cfeeff',
-          200: '#b3e5ff',
-          300: '#82d6ff',
-          400: '#4cc0ff',
-          500: '#0077B6',
-          600: '#00649a',
-          700: '#025078',
-          800: '#023a57',
-          900: '#02283a',
-          DEFAULT: '#0077B6'
-        }
+        primary: '#4F46E5',        // Indigo-600: Professional, tech-forward
+        primaryDark: '#4338CA',    // Indigo-700: Darker for hover/active states
+        accent: '#10B981',         // Emerald-500: Fresh, growth-oriented accent
+        accentDark: '#059669',     // Emerald-600: Darker for hover
+        background: '#F8FAFC',     // Slate-50: Clean, light background
+        surface: '#F1F5F9',        // Slate-100: Card backgrounds
+        footer: '#1E293B',         // Slate-800: Dark footer
       },
     },
   },

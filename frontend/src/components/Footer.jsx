@@ -35,12 +35,12 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-blue-950 text-gray-300 pt-12 pb-6">
+    <footer className="bg-slate-900 text-slate-300 pt-12 pb-6">
       <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Brand Section */}
         <div>
           <h2 className="text-2xl font-bold text-white mb-3">PeerLearn</h2>
-          <p className="text-sm leading-relaxed mb-3 text-gray-400">
+          <p className="text-sm leading-relaxed mb-3 text-slate-400">
             Empowering learners through collaboration and shared knowledge.
           </p>
           <div className="text-sm text-gray-300 mb-3">support@peerlearn.app</div>
@@ -136,12 +136,12 @@ export default function Footer() {
               placeholder="Enter your email"
               value={email}
               onChange={e=>setEmail(e.target.value)}
-              className="w-full sm:flex-1 px-3 py-2 mb-2 sm:mb-0 rounded-md text-white bg-transparent border border-blue-800 focus:ring-2 focus:ring-blue-600"
+              className="w-full sm:flex-1 px-3 py-2 mb-2 sm:mb-0 rounded-md text-white bg-transparent border border-indigo-600 focus:ring-2 focus:ring-indigo-500"
             />
             <button
               type="submit"
               disabled={submitting}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center justify-center transition-all disabled:opacity-60"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md flex items-center justify-center transition-all disabled:opacity-60"
             >
               <Mail size={18} className="mr-2" /> {submitting ? 'Subscribing...' : 'Subscribe'}
             </button>

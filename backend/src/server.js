@@ -15,6 +15,7 @@ const sectionRoutes = require('./routes/sectionRoutes');
 const enrollmentRoutes = require('./routes/enrollmentRoutes');
 const discussionRoutes = require('./routes/discussionRoutes');
 const progressRoutes = require('./routes/progressRoutes');
+const assignmentRoutes = require('./routes/assignmentRoutes');
 
 const reviewRoutes = require('./routes/reviewRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
@@ -70,6 +71,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/progress', progressRoutes);
+app.use('/api/assignments', assignmentRoutes);
 
 
 app.get('/', (req, res) => {

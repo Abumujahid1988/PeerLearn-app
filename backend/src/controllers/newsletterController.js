@@ -1,6 +1,23 @@
 const Newsletter = require('../models/Newsletter');
 const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+// Prefer explicit SENDGRID_API_KEY, but allow using SMTP_PASS if it contains a SendGrid key (starts with 'SG.')
+let sendGridApiKey = process.env.SENDGRID_API_KEY || null;
+if (!sendGridApiKey && process.env.SMTP_PASS && String(process.env.SMTP_PASS).startsWith('SG.')) {
+  sendGridApiKey = process.env.SMTP_PASS;
+}
+
+const isSendGridEnabled = !!sendGridApiKey;
+if (isSendGridEnabled) {
+  try {
+    sgMail.setApiKey(sendGridApiKey);
+    console.info('SendGrid is enabled for outgoing newsletter emails.');
+  } catch (e) {
+    console.error('Failed to initialize SendGrid mail client. Emails will be skipped.', e);
+  }
+} else {
+  console.warn('SendGrid not configured — newsletter emails will be skipped. Set SENDGRID_API_KEY in environment to enable.');
+}
 
 exports.subscribe = async (req, res) => {
   try {
@@ -20,15 +37,19 @@ exports.subscribe = async (req, res) => {
     // Send confirmation email via SendGrid
     const msg = {
       to: doc.email,
-      from: process.env.SENDGRID_FROM_EMAIL || 'no-reply@peerlearn.app',
+      from: process.env.SENDGRID_FROM_EMAIL || process.env.SMTP_FROM || 'abumujahid555@gmail.com',
       subject: 'PeerLearn Newsletter Subscription',
       text: `Hello${name ? ' ' + name : ''},\n\nThank you for subscribing to PeerLearn updates!`,
       html: `<p>Hello${name ? ' ' + name : ''},</p><p>Thank you for subscribing to <b>PeerLearn</b> updates!</p>`
     };
-    try {
-      await sgMail.send(msg);
-    } catch (emailErr) {
-      console.error('SendGrid email error:', emailErr);
+    if (isSendGridEnabled) {
+      try {
+        await sgMail.send(msg);
+      } catch (emailErr) {
+        console.error('SendGrid email error:', emailErr);
+      }
+    } else {
+      console.info('SendGrid not configured; skipping subscription confirmation email.');
     }
 
     return res.json({ message: 'Subscribed', subscriber: { email: doc.email, name: doc.name } });

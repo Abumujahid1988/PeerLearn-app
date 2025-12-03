@@ -39,7 +39,10 @@ exports.get = async (req, res) => {
       .populate('instructor', 'name email')
       .populate({
         path: 'sections',
-        populate: { path: 'lessons', model: 'Lesson' }
+        populate: [
+          { path: 'lessons', model: 'Lesson' },
+          { path: 'assignments', model: 'Assignment' }
+        ]
       });
     if(!course) return res.status(404).json({ error: 'Not found' });
     res.json(course);

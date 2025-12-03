@@ -1,14 +1,16 @@
 import React, { useEffect, useState, useContext, useRef, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { AuthContext } from '../context/AuthContext';
 import CourseDiscussion from '../components/CourseDiscussion';
 import ChatRoom from '../components/ChatRoom';
 import DOMPurify from 'dompurify';
 import { useToast } from '../context/ToastContext';
+import { FileText, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function CourseDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
@@ -30,6 +32,8 @@ export default function CourseDetail() {
   const videoElRef = useRef(null);
   const ytPlayerRef = useRef(null);
   const ytScriptLoadedRef = useRef(false);
+  const [assignments, setAssignments] = useState([]);
+  const [studentSubmissions, setStudentSubmissions] = useState({});
 
   // focus modal and handle Escape to close
   useEffect(() => {
@@ -46,31 +50,76 @@ export default function CourseDetail() {
   useEffect(()=>{
     let mounted = true;
     setLoading(true);
-    api.get(`/courses/${id}`)
-      .then(r=>{ if(mounted) setCourse(r.data) })
-      .catch(err=>{ console.error('Failed to load course', err) })
-      .finally(()=>{ if(mounted) setLoading(false) });
-    // Fetch reviews
-    api.get(`/reviews/courses/${id}/reviews`)
-      .then(r => {
-        if (mounted) {
-          setReviews(r.data.reviews || []);
-          setAvgRating(r.data.rating || 0);
-          if (user) {
-            const mine = (r.data.reviews || []).find(rv => rv.student === (user._id || user.id));
-            if (mine) {
-              setMyRating(mine.rating);
-              setMyComment(mine.comment || '');
-            } else {
-              setMyRating(0);
-              setMyComment('');
-            }
+    Promise.all([
+      api.get(`/courses/${id}`),
+      api.get(`/reviews?courseId=${id}`).catch(()=>({ data: [] }))
+    ])
+      .then(([courseRes, reviewRes]) => {
+        if(mounted) {
+          setCourse(courseRes.data);
+          const reviews = reviewRes.data;
+          setReviews(reviews);
+          if(reviews.length) {
+            const avg = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+            setAvgRating(avg);
           }
         }
       })
-      .catch(err => { console.error('Failed to load reviews', err); });
-    return ()=> mounted = false;
-  },[id, user]);
+      .catch(err => console.error('Failed to load course', err))
+      .finally(() => { if(mounted) setLoading(false); });
+    return () => { mounted = false; };
+  }, [id]);
+
+  // Load assignments for the course
+  useEffect(() => {
+    let mounted = true;
+    if (!course || !course.sections) return;
+
+    (async () => {
+      try {
+        const allAssignments = [];
+        const sectionIdsToFetch = [];
+
+        // Sections may be populated objects or just IDs
+        course.sections.forEach(section => {
+          if (section && typeof section === 'object' && Array.isArray(section.assignments)) {
+            allAssignments.push(...section.assignments);
+          } else if (section) {
+            // section is likely an id string
+            sectionIdsToFetch.push(section._id || section);
+          }
+        });
+
+        // If some sections were not populated, fetch assignments per-section
+        if (sectionIdsToFetch.length > 0) {
+          const results = await Promise.all(
+            sectionIdsToFetch.map(sid => api.get(`/assignments/section/${sid}`).then(r => r.data).catch(() => []))
+          );
+          results.forEach(arr => { if (Array.isArray(arr)) allAssignments.push(...arr); });
+        }
+
+        if (!mounted) return;
+        setAssignments(allAssignments);
+
+        // Load student submissions if enrolled
+        if (user?.role === 'student' && allAssignments.length > 0) {
+          const submissions = await Promise.all(
+            allAssignments.map(a => api.get(`/assignments/${a._id}/submission`).then(r => r.data).catch(() => null))
+          );
+          if (!mounted) return;
+          const subs = {};
+          submissions.forEach((res, idx) => {
+            if (res) subs[allAssignments[idx]._id] = res;
+          });
+          setStudentSubmissions(subs);
+        }
+      } catch (err) {
+        console.error('Failed to process assignments', err);
+      }
+    })();
+
+    return () => { mounted = false; };
+  }, [course, id, user?.role]);
 
   // Load progress (completed lessons) for enrolled students
   useEffect(() => {
@@ -278,17 +327,17 @@ export default function CourseDetail() {
             <img src={course.thumbnail} alt={course.title} className="w-44 h-32 object-cover rounded-lg border" />
           )}
           <div className="flex-1">
-            <h2 className="text-3xl font-bold text-blue-900 mb-2">{course.title}</h2>
+            <h2 className="text-3xl font-bold text-indigo-900 mb-2">{course.title}</h2>
             <p className="text-base text-slate-700 mb-2">{course.description}</p>
             <div className="flex flex-wrap gap-2 mb-2">
-              {course.tags?.map(tag => <span key={tag} className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">{tag}</span>)}
+              {course.tags?.map(tag => <span key={tag} className="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-xs">{tag}</span>)}
             </div>
             <div className="text-sm text-slate-600 mb-1">{course.difficulty} &bull; {course.category}</div>
-            <div className="font-bold text-blue-700 text-lg">${course.price}</div>
+            <div className="font-bold text-indigo-700 text-lg">${course.price}</div>
             <div className="mt-4">
               <div className="flex items-center gap-2">
                 <span className="text-yellow-500 text-xl">★</span>
-                <span className="font-semibold text-blue-900">{avgRating.toFixed(1)}</span>
+                <span className="font-semibold text-indigo-900">{avgRating.toFixed(1)}</span>
                 <span className="text-slate-500 text-sm">({reviews.length} review{reviews.length !== 1 ? 's' : ''})</span>
               </div>
             </div>
@@ -296,7 +345,7 @@ export default function CourseDetail() {
             {course.resourceLinks?.length > 0 && showStudentContent && (
               <button
                 onClick={() => setShowResources(true)}
-                className="mt-4 w-full md:inline-block px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"
+                className="mt-4 w-full md:inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors shadow-md"
               >
                 Click to explore
               </button>
@@ -304,14 +353,14 @@ export default function CourseDetail() {
             {course.resourceLinks?.length > 0 && !showStudentContent && user?.role === 'student' && (
               <div className="mt-4 w-full md:flex md:items-center md:gap-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
                 <div className="flex-1 text-sm text-slate-600">Resources are available for enrolled students.</div>
-                <button onClick={enroll} disabled={enrolling} className="mt-2 md:mt-0 px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 whitespace-nowrap">
+                <button onClick={enroll} disabled={enrolling} className="mt-2 md:mt-0 px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 whitespace-nowrap">
                   {enrolling ? 'Enrolling...' : 'Enroll now'}
                 </button>
               </div>
             )}
             {course.resourceLinks?.length > 0 && !user && (
               <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-200 text-sm text-slate-600">
-                <Link to="/login" className="text-blue-600 hover:underline font-semibold">Login</Link> to access course resources.
+                <Link to="/login" className="text-indigo-600 hover:underline font-semibold">Login</Link> to access course resources.
               </div>
             )}
 
@@ -321,7 +370,7 @@ export default function CourseDetail() {
                 <div className="absolute inset-0 bg-black/40" onClick={() => setShowResources(false)} />
                   <div ref={modalRef} tabIndex={-1} className="relative z-10 w-full max-w-2xl mx-4 bg-white rounded-lg shadow-lg p-6 outline-none">
                   <div className="flex items-start justify-between mb-4">
-                    <h4 className="text-lg font-semibold text-blue-800">Course Resources</h4>
+                    <h4 className="text-lg font-semibold text-indigo-800">Course Resources</h4>
                     <button onClick={() => setShowResources(false)} className="text-slate-600 hover:text-slate-800">Close</button>
                   </div>
                   <div className="space-y-3 max-h-96 overflow-auto">
@@ -355,8 +404,8 @@ export default function CourseDetail() {
       {user?.role === 'student' && (
       <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-100">
         <div className="mb-6">
-          <h3 className="text-2xl font-bold text-blue-900 mb-2">Course Curriculum</h3>
-          <p className="text-slate-600">{course.sections?.length || 0} sections • {course.sections?.reduce((sum, s) => sum + (s.lessons?.length || 0), 0) || 0} lessons</p>
+          <h3 className="text-2xl font-bold text-indigo-900 mb-2">Course Curriculum</h3>
+          <p className="text-slate-600">{course.sections?.length || 0} sections • {course.sections?.reduce((sum, s) => sum + (s.lessons?.length || 0), 0) || 0} lessons • {assignments.length} assignments</p>
         </div>
 
         {course.sections?.length ? (
@@ -374,7 +423,7 @@ export default function CourseDetail() {
                     <button
                       key={section._id}
                       onClick={() => toggleSection(section._id)}
-                      className="flex-shrink-0 w-72 p-5 bg-gradient-to-br from-blue-50 to-slate-50 rounded-lg border border-blue-200 hover:shadow-lg hover:border-blue-400 transition-all"
+                      className="flex-shrink-0 w-72 p-5 bg-gradient-to-br from-indigo-50 to-slate-50 rounded-lg border border-indigo-200 hover:shadow-lg hover:border-indigo-400 transition-all"
                     >
                       <div className="flex items-start justify-between gap-3 mb-3">
                         <div className="flex items-center gap-2 flex-1">
@@ -391,13 +440,13 @@ export default function CourseDetail() {
                         <span className="text-slate-400 text-lg">{isExpanded ? '▼' : '▶'}</span>
                       </div>
                       <div className="bg-slate-200 rounded-full h-2 overflow-hidden">
-                        <div className="h-full bg-blue-600 transition-all" style={{ width: `${sectionProgress}%` }} />
+                        <div className="h-full bg-indigo-600 transition-all" style={{ width: `${sectionProgress}%` }} />
                       </div>
                       <div className="text-xs text-blue-600 font-semibold mt-2">{sectionProgress}% Complete</div>
 
                       {/* Section lessons preview - visible when expanded */}
                       {isExpanded && (
-                        <div className="mt-4 pt-4 border-t border-blue-200 space-y-2">
+                        <div className="mt-4 pt-4 border-t border-indigo-200 space-y-2">
                           {sectionLessons.length ? (
                             sectionLessons.slice(0, 3).map(lesson => {
                               const isCompleted = completedLessons.includes(lesson._id || lesson);
@@ -407,7 +456,7 @@ export default function CourseDetail() {
                                   key={lesson._id}
                                   role="button"
                                   tabIndex={0}
-                                  className={`w-full text-left text-xs px-2 py-1 rounded flex items-center gap-2 transition-colors cursor-pointer ${isSelected ? 'bg-blue-100 border border-blue-400' : 'hover:bg-slate-100'}`}
+                                  className={`w-full text-left text-xs px-2 py-1 rounded flex items-center gap-2 transition-colors cursor-pointer ${isSelected ? 'bg-indigo-100 border border-indigo-400' : 'hover:bg-slate-100'}`}
                                   onClick={e => { e.stopPropagation(); selectLesson(lesson); }}
                                   onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); selectLesson(lesson); } }}
                                 >
@@ -442,7 +491,7 @@ export default function CourseDetail() {
               ) : (
                 <div className="bg-white rounded-lg border border-slate-200 shadow-md overflow-hidden max-w-3xl mx-auto">
                   {/* Header */}
-                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 border-b border-blue-800">
+                  <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white p-6 border-b border-indigo-800">
                     <div className="flex items-start justify-between gap-4 mb-4">
                       <div className="flex-1">
                         <h4 className="text-2xl font-bold mb-2">{selectedLesson.title}</h4>
@@ -457,7 +506,7 @@ export default function CourseDetail() {
                           <button
                             disabled={marking}
                             onClick={() => markLessonComplete(selectedLesson._id)}
-                            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors disabled:opacity-60 whitespace-nowrap"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors disabled:opacity-60 whitespace-nowrap"
                           >
                             {marking ? 'Saving...' : '✓ Mark Complete'}
                           </button>
@@ -519,7 +568,7 @@ export default function CourseDetail() {
                               href={a.url}
                               target="_blank"
                               rel="noreferrer"
-                              className="p-4 border border-slate-200 rounded-lg bg-gradient-to-r from-slate-50 to-white hover:shadow-md hover:border-blue-300 transition-all flex items-center gap-3 group"
+                              className="p-4 border border-slate-200 rounded-lg bg-gradient-to-r from-slate-50 to-white hover:shadow-md hover:border-indigo-300 transition-all flex items-center gap-3 group"
                             >
                               <div className="text-3xl flex-shrink-0">{a.type === 'pdf' ? '📄' : a.type === 'video' ? '🎥' : a.type === 'image' ? '🖼️' : '📎'}</div>
                               <div className="flex-1 min-w-0">
@@ -568,6 +617,125 @@ export default function CourseDetail() {
       </div>
       )}
 
+      {/* Assignments Section */}
+      {assignments.length > 0 && (
+      <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-100">
+        <div className="mb-6">
+          <h3 className="text-2xl font-bold text-indigo-900 mb-2">Assignments</h3>
+          <p className="text-slate-600">{assignments.length} assignment{assignments.length !== 1 ? 's' : ''}</p>
+        </div>
+
+        <div className="space-y-4">
+          {assignments.map(assignment => {
+            const submission = studentSubmissions[assignment._id];
+            const isOverdue = new Date() > new Date(assignment.dueDate);
+            const isSubmitted = submission?.status === 'submitted' || submission?.status === 'graded';
+            const isGraded = submission?.status === 'graded';
+
+            return (
+              <div
+                key={assignment._id}
+                className="p-4 border border-slate-300 rounded-lg hover:shadow-md transition-all bg-gradient-to-r from-slate-50 to-white"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-2">
+                      <FileText size={20} className="text-indigo-600 flex-shrink-0" />
+                      <h4 className="text-lg font-semibold text-slate-900 truncate">{assignment.title}</h4>
+                    </div>
+                    <p className="text-sm text-slate-600 mb-3">{assignment.description}</p>
+
+                    <div className="flex flex-wrap gap-4 text-xs">
+                      <div className="text-slate-600">
+                        <span className="font-semibold">Due:</span> {new Date(assignment.dueDate).toLocaleDateString()}
+                      </div>
+                      <div className="text-slate-600">
+                        <span className="font-semibold">Points:</span> {assignment.totalPoints}
+                      </div>
+                      <div className="text-slate-600">
+                        <span className="font-semibold">Questions:</span> {assignment.questions?.length || 0}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex-shrink-0 text-right">
+                    {/* Status Badge - only for students */}
+                    {user?.role === 'student' && (
+                    <div className="mb-3">
+                      {isGraded && (
+                        <div className="flex items-center justify-end gap-2 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-lg">
+                          <CheckCircle size={16} className="text-emerald-600" />
+                          <div>
+                            <p className="text-xs font-semibold text-emerald-700">Graded</p>
+                            <p className="text-sm font-bold text-emerald-900">
+                              {submission.scorePercentage.toFixed(1)}%
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      {isSubmitted && !isGraded && (
+                        <div className="flex items-center justify-end gap-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+                          <AlertCircle size={16} className="text-blue-600" />
+                          <div>
+                            <p className="text-xs font-semibold text-blue-700">Submitted</p>
+                            <p className="text-xs text-blue-600">Pending grading</p>
+                          </div>
+                        </div>
+                      )}
+                      {!isSubmitted && (
+                        <div className={`px-3 py-2 rounded-lg border ${
+                          isOverdue
+                            ? 'bg-red-50 border-red-200'
+                            : 'bg-yellow-50 border-yellow-200'
+                        }`}>
+                          <p className={`text-xs font-semibold ${
+                            isOverdue ? 'text-red-700' : 'text-yellow-700'
+                          }`}>
+                            {isOverdue ? 'Overdue' : 'Not Submitted'}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    )}
+                    {/* Info for instructors */}
+                    {(user?.role === 'instructor' || user?.role === 'admin') && (
+                    <div className="mb-3 text-right">
+                      <div className="text-xs text-slate-600">
+                        <span className="font-semibold">Due:</span><br/>
+                        {new Date(assignment.dueDate).toLocaleDateString()}
+                      </div>
+                    </div>
+                    )}
+
+                    {/* Action Button */}
+                    {user?.role === 'instructor' || user?.role === 'admin' ? (
+                      <button
+                        onClick={() => navigate(`/assignments/${assignment._id}/grader`)}
+                        className="w-full px-4 py-2 rounded-lg font-semibold transition-colors text-sm bg-emerald-600 text-white hover:bg-emerald-700"
+                      >
+                        Grade Submissions
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => navigate(`/courses/${id}/assignments/${assignment._id}`)}
+                        className={`w-full px-4 py-2 rounded-lg font-semibold transition-colors text-sm ${
+                          isGraded
+                            ? 'bg-slate-300 text-slate-900 hover:bg-slate-400'
+                            : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                        }`}
+                      >
+                        {isGraded ? 'View' : isSubmitted ? 'View Submission' : 'Attempt'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      )}
+
       <div className="flex justify-end gap-3">
         <button
           onClick={reportCourse}
@@ -579,7 +747,7 @@ export default function CourseDetail() {
           <button
             onClick={enroll}
             disabled={enrolling || isEnrolled}
-            className={`px-6 py-2 rounded-lg font-semibold shadow transition-all duration-150 ${isEnrolled ? 'bg-green-600 text-white' : 'bg-blue-700 hover:bg-blue-800 text-white'} ${enrolling ? 'opacity-60' : ''}`}
+            className={`px-6 py-2 rounded-lg font-semibold shadow transition-all duration-150 ${isEnrolled ? 'bg-emerald-600 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white'} ${enrolling ? 'opacity-60' : ''}`}
           >
             {isEnrolled ? 'Enrolled' : (enrolling ? 'Enrolling...' : 'Enroll')}
           </button>

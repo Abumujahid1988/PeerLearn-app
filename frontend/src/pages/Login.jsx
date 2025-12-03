@@ -30,12 +30,12 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50">
       <form
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md"
       >
-        <h2 className="text-3xl font-bold mb-6 text-blue-700 text-center">Login</h2>
+        <h2 className="text-3xl font-bold mb-6 text-indigo-600 text-center">Login</h2>
 
         {error && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -48,7 +48,7 @@ export default function Login() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
-          className="w-full mb-4 p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full mb-4 p-3 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
           required
         />
 
@@ -58,17 +58,17 @@ export default function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
-          className="w-full mb-2 p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full mb-2 p-3 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
           required
         />
         <div className="mb-6 text-right">
-          <Link to="/forgot-password" className="text-blue-600 hover:underline text-sm">Forgot password?</Link>
+          <Link to="/forgot-password" className="text-indigo-600 hover:underline text-sm">Forgot password?</Link>
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 rounded-lg shadow-md transition duration-300"
+          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 text-white font-semibold py-3 rounded-lg shadow-md transition duration-300"
         >
           {loading ? 'Logging in...' : 'Login'}
         </button>

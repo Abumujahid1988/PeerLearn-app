@@ -62,7 +62,7 @@ export default function AdminReports(){
                   <div className='text-xs text-slate-500'>Status: <span className='font-semibold'>{r.status}</span></div>
                   <div className='flex gap-2'>
                     <button onClick={()=>updateStatus(r._id, 'in-review')} className='px-2 py-1 bg-yellow-500 text-white rounded text-sm'>In Review</button>
-                    <button onClick={()=>updateStatus(r._id, 'resolved')} className='px-2 py-1 bg-green-600 text-white rounded text-sm'>Resolve</button>
+                    <button onClick={()=>updateStatus(r._id, 'resolved')} className='px-2 py-1 bg-emerald-600 text-white rounded text-sm hover:bg-emerald-700'>Resolve</button>
                     <button onClick={()=>remove(r._id)} className='px-2 py-1 bg-red-600 text-white rounded text-sm'>Delete</button>
                   </div>
                 </div>
